@@ -6,5 +6,5 @@ public interface IRoleManager<TRole> where TRole : IRole
 {
     void AddRole(TRole role);
     void RemoveRole(TRole role);
-    TRole GetRole(string name);
+    TRole? GetRole(string name);
 }
