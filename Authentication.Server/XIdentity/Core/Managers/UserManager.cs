@@ -17,28 +17,28 @@ public class UserManager : IUserManager<AppUser>
         _validator = validator;
     }
 
-    public bool Register(IUser user)
+    public async Task<bool> Register(AppUser user)
+    {
+        var validation = _validator.Validate(user.User);
+        if (validation.IsValid is not true)
+            throw new Exception(validation.ToString());
+
+        await _userFactory.AddUser(user);
+
+        return true;
+    }
+
+    public async Task<bool> DeleteAccount(string userId)
+    {
+        await _userFactory.RemoveUser(userId);
+        return true;
+    }
+
+    public async Task<bool> ChangePassword(string userId, string oldPassword, string newPassword)
     {
         
     }
 
-    public bool DeleteAccount(string userId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool ChangePassword(string userId, string oldPassword, string newPassword)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool ChangeEmail(string userId, string newEmail)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool IsValidPassword(string userId, string passwordHash)
-    {
-        throw new NotImplementedException();
-    }
+    public Task<bool> ChangeEmail(string userId, string newEmail) => throw new NotImplementedException();
+    public Task<bool> IsValidPassword(string userId, string passwordHash) => throw new NotImplementedException();
 }
