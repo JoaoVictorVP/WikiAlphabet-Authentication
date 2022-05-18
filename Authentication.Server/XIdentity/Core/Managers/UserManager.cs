@@ -1,15 +1,15 @@
 ﻿using Authentication.Server.XIdentity.Contracts;
+using Authentication.Server.XIdentity.Contracts.Factories;
 using Authentication.Server.XIdentity.Contracts.Managers;
-using Authentication.Server.XIdentity.Contracts.Repositories;
 using Authentication.Server.XIdentity.Core.Models;
 
 namespace Authentication.Server.XIdentity.Core.Managers;
 
 public class UserManager : IUserManager<AppUser>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserFactory _userRepository;
 
-    public UserManager(IUserRepository userRepository)
+    public UserManager(IUserFactory userRepository)
     {
         _userRepository = userRepository;
     }
