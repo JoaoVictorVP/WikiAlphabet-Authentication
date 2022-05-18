@@ -1,6 +1,8 @@
 ﻿using Authentication.Server.XIdentity.Contracts;
+using Authentication.Server.XIdentity.Contracts.Factories;
 using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Repositories;
+using Authentication.Server.XIdentity.Core.Factories;
 using Authentication.Server.XIdentity.Core.Managers;
 using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Server.XIdentity.Core.Repositories;
@@ -37,6 +39,7 @@ public static class ApplicationExtensions
         });
 
         services.AddTransient<IUserManager<AppUser>, UserManager>();
+        services.AddTransient<IUserFactory, UserFactory>();
         services.AddTransient<IUserRepository, UserRepository>();
 
         services.AddTransient<IRoleManager<Role>, RoleManager>();
