@@ -12,5 +12,5 @@ public class Role : IRole
         Name = role;
     }
 
-    IList<IClaim> IRole.Claims { get => Claims; set => Claims = value; }
+    IList<IClaim> IRole.Claims { get => Claims; set => Claims = (List<IClaim>)value; }
 }

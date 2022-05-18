@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ public class User
     public string Name { get; set; } = "";
     public string Username { get; set; } = "";
     public string Email { get; set; } = "";
+    [IgnoreDataMember]
     public string Password { get; set; } = "";
     
     public List<UserRole> UserRoles { get; set; } = new (32);

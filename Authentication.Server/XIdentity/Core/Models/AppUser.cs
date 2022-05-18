@@ -21,7 +21,6 @@ public class AppUser : IUser
     public string Username { get => _user.Username; set => _user.Username = value; }
     [IgnoreDataMember]
     public string Email { get => _user.Email; set => _user.Email = value; }
-    [IgnoreDataMember]
     public string PasswordHash => CryptoUtils.HashPassword(_user.Password, Env.Salt);
 
     public IEnumerable<UserRole> GetAllRoles() => _user.UserRoles;

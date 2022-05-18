@@ -7,5 +7,6 @@ public interface IUserStorage
     Task<IUser?> GetUserByEmail(string email);
     IAsyncEnumerable<IUser> GetUsersByRole(string roleName);
     Task AddUser(IUser user);
+    Task UpdateUser(string id, IUser user);
     Task RemoveUser(string id);
 }
