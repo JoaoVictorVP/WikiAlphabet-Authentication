@@ -14,7 +14,7 @@ public class User
     public string Email { get; set; } = "";
     public string Password { get; set; } = "";
     
-    public UserRole Role { get; set; } = UserRole.None;
+    public List<UserRole> UserRoles { get; set; } = new (32);
 
     public bool Active { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Now;
