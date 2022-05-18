@@ -2,21 +2,24 @@
 using Authentication.Server.XIdentity.Contracts.Factories;
 using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Core.Models;
+using Authentication.Shared.Contracts.Validators;
 
 namespace Authentication.Server.XIdentity.Core.Managers;
 
 public class UserManager : IUserManager<AppUser>
 {
-    private readonly IUserFactory _userRepository;
+    private readonly IUserFactory _userFactory;
+    private readonly IUserValidator _validator;
 
-    public UserManager(IUserFactory userRepository)
+    public UserManager(IUserFactory userFactory, IUserValidator validator)
     {
-        _userRepository = userRepository;
+        _userFactory = userFactory;
+        _validator = validator;
     }
 
     public bool Register(IUser user)
     {
-        throw new NotImplementedException();
+        
     }
 
     public bool DeleteAccount(string userId)
