@@ -10,7 +10,7 @@ public interface IUser
     string Email { get; set; }
     string PasswordHash { get; }
     IEnumerable<UserRole> GetAllRoles();
-    UserRole GetRole(string roleName);
+    UserRole? GetRole(string roleName);
     void AddRole(UserRole role);
     void RemoveRole(string roleName);
 }
