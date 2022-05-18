@@ -1,4 +1,6 @@
 ﻿using AspNetCore.Identity.LiteDB;
+using AspNetCore.Identity.LiteDB.Models;
+using Authentication.Server.Models;
 using Authentication.Shared;
 
 namespace Authentication.Server.Configuration;
@@ -34,6 +36,7 @@ public static class ApplicationExtensions
                 DefaultLockoutTimeSpan = TimeSpan.FromDays(5)
             };
         })
-        .AddUserStore<LiteDbUserStore<ApplicationUser>>();
+        .AddUserStore<LiteDbUserStore<ApplicationUser>>()
+        .AddRoleStore<LiteDbRoleStore<IdentityRole>>();
     }
 }
