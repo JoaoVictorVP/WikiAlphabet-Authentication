@@ -18,8 +18,8 @@ public class AppUser : IUser
     public string Email { get => _user.Email; set => _user.Email = value; }
     public string PasswordHash => CryptoUtils.HashPassword(_user.Password, Env.Salt);
 
-    public IEnumerable<UserRole> GetAllRoles() => throw new NotImplementedException();
-    public UserRole GetRole(string roleName) => throw new NotImplementedException();
-    public void AddRole(UserRole role) => throw new NotImplementedException();
-    public void RemoveRole(string roleName) => throw new NotImplementedException();
+    public IEnumerable<UserRole> GetAllRoles() => _user.UserRoles;
+    public UserRole? GetRole(string roleName) => _user.UserRoles.Find(role => role.RoleName == roleName);
+    public void AddRole(UserRole role) => _user.UserRoles.Add(role);
+    public void RemoveRole(string roleName) => _user.UserRoles.RemoveAll(role => role.RoleName == roleName);
 }
