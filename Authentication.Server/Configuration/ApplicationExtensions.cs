@@ -1,4 +1,10 @@
-﻿using Authentication.Shared;
+﻿using Authentication.Server.XIdentity.Contracts;
+using Authentication.Server.XIdentity.Contracts.Managers;
+using Authentication.Server.XIdentity.Contracts.Repositories;
+using Authentication.Server.XIdentity.Core.Managers;
+using Authentication.Server.XIdentity.Core.Models;
+using Authentication.Server.XIdentity.Core.Repositories;
+using Authentication.Shared;
 using Authentication.Shared.Contracts.Validators;
 using Authentication.Shared.Core.Validators;
 using Microsoft.AspNetCore.Authentication;
@@ -29,6 +35,11 @@ public static class ApplicationExtensions
                 ValidateAudience = false
             };
         });
+
+        services.AddTransient<IUserManager<AppUser>, UserManager>();
+        services.AddTransient<IUserRepository, UserRepository>();
+
+        services.AddTransient<IRoleManager<Role>, RoleManager>();
     }
 
     public static void ConfigureAuth(this WebApplication app)
