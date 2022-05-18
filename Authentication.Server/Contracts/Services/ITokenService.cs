@@ -1,6 +1,6 @@
 ﻿using Authentication.Shared;
 
-namespace Authentication.Server.Contracts;
+namespace Authentication.Server.Contracts.Services;
 
 public interface ITokenService
 {
