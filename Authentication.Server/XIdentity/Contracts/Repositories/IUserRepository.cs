@@ -1,11 +1,8 @@
-﻿namespace Authentication.Server.XIdentity.Contracts.Repositories;
+﻿using Authentication.Server.XIdentity.Contracts.Storage;
 
-public interface IUserRepository
+namespace Authentication.Server.XIdentity.Contracts.Repositories;
+
+public interface IUserRepository : IUserStorage
 {
-    IUser GetUser(IUser user);
-    IUser GetUserByUsername(string username);
-    IUser GetUserByEmail(string email);
-    IAsyncEnumerable<IUser> GetUsersByRole(string roleName);
-    void AddUser(IUser user);
-    void RemoveUser(string id);
+    
 }
