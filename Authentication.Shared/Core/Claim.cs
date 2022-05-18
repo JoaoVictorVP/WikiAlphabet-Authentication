@@ -1,10 +1,5 @@
-﻿namespace Authentication.Shared;
+﻿using Authentication.Shared.Contracts;
 
-public record class Claim(string Name, ClaimLevel Level);
+namespace Authentication.Shared;
 
-public enum ClaimLevel
-{
-    ReadOnly,
-    WriteOnly,
-    WriteAndRead
-}
+public record class Claim(string Name, ClaimLevel Level) : IClaim;
