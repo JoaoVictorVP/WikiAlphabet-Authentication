@@ -16,7 +16,12 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7256;http://localhost:5005",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+
+        "WIKI_AUTH_SECRET": "f9597e6b0e875ccc1fa69f036eed7c4225282078ca91f71605ce182b052621bd",
+        "WIKI_AUTH_SALT": "f9597e6b0e875ccc1fa69f036eed7c4225282078ca91f71605ce182b052621bd",
+        "WIKI_AUTH_BCRYPT_WORK_FACTOR": "10",
+        "WIKI_TOKEN_LIFETIME": "10:00:00"
       }
     },
     "IIS Express": {
