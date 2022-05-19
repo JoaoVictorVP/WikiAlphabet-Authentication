@@ -4,9 +4,14 @@ namespace Authentication.Server.XIdentity.Contracts.Managers;
 
 public interface IUserManager<TUser> where TUser : IUser
 {
-    bool Register(IUser user);
-    bool DeleteAccount(string userId);
-    bool ChangePassword(string userId, string oldPassword, string newPassword);
-    bool ChangeEmail(string userId, string newEmail);
-    bool IsValidPassword(string userId, string passwordHash);
+    string DoHashPassword(string password);
+    Task<TUser?> FindByEmailAsync(string email);
+    Task<TUser?> FindByUsernameAsync(string username);
+    Task<TUser?> GetUserAsync(string userId);
+    Task<bool> RegisterAsync(TUser user);
+    Task<bool> DeleteAccountAsync(string userId);
+    Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword);
+    Task<bool> ChangeEmailAsync(string userId, string newEmail, string serverConfirmationCode, string clientConfirmationCode);
+    Task<bool> IsValidPasswordAsync(IUser user, string passwordOrPasswordHash);
+    string GenerateConfirmationCode(string action);
 }

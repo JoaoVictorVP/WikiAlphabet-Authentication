@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication.Server", "Au
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication.Shared", "Authentication.Shared\Authentication.Shared.csproj", "{CCA8754B-845B-4905-986B-5A573C5CE53D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authentication.Server.Tests", "Authentication.Server.Tests\Authentication.Server.Tests.csproj", "{9FEC67ED-1423-4B4D-85F0-4473DF0AEAF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{CCA8754B-845B-4905-986B-5A573C5CE53D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCA8754B-845B-4905-986B-5A573C5CE53D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCA8754B-845B-4905-986B-5A573C5CE53D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FEC67ED-1423-4B4D-85F0-4473DF0AEAF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FEC67ED-1423-4B4D-85F0-4473DF0AEAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FEC67ED-1423-4B4D-85F0-4473DF0AEAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FEC67ED-1423-4B4D-85F0-4473DF0AEAF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

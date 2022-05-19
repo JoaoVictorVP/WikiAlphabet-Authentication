@@ -1,12 +1,16 @@
-﻿namespace Authentication.Shared;
+﻿using Authentication.Shared.Contracts;
 
-public class Role
+namespace Authentication.Shared;
+
+public class Role : IRole
 {
     public string Name { get; set; } = "";
-    public List<Claim> Permissions { get; set; } = new(32);
+    public List<IClaim> Claims { get; set; } = new(32);
 
     public Role(string role)
     {
         Name = role;
     }
+
+    IList<IClaim> IRole.Claims { get => Claims; set => Claims = (List<IClaim>)value; }
 }
