@@ -90,6 +90,7 @@ namespace Authentication.Server.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
         [AllowAnonymous]
@@ -103,7 +104,7 @@ namespace Authentication.Server.Controllers
                 return NotFound("User not found");
             var validPassword = await _userManager.IsValidPasswordAsync(user, password);
             if(validPassword is false)
-                return Forbid("Invalid password");
+                return StatusCode(StatusCodes.Status403Forbidden, "Invalid password");
 
             return Ok(ProduceTokenAndUserResponse(user));
         }
