@@ -9,6 +9,7 @@ using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Shared;
 using Authentication.Shared.Contracts.Validators;
 using Authentication.Shared.Core.Requests;
+using Authentication.Shared.Core.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,29 +32,27 @@ namespace Authentication.Server.Controllers
             _tokenService = tokenService;
         }
 
-        dynamic ProduceTokenAndUserResponse(AppUser user)
+        AccountResponse ProduceTokenAndUserResponse(AppUser user)
         {
             var token = _tokenService.GenerateToken(Env.Secret, user, Env.TokenLifetime);
             var nUser = user.User;
-            return new
-            {
-                Token = token,
-                Application = Env.ApplicationId,
-                ExpirationDate = Env.TokenExpirationDate,
-                User = new
+
+            return new AccountResponse(token,
+                Env.ApplicationId,
+                Env.TokenExpirationDate,
+                new User
                 {
-                    nUser.Name,
-                    nUser.Username,
-                    nUser.Email,
-                    nUser.Active,
-                    nUser.UserRoles,
-                    nUser.Id,
-                    nUser.CreatedDate,
-                    nUser.DeletedDate,
-                    nUser.Deleted,
-                    RedisGuid = Guid.NewGuid()
-                }
-            };
+                    Name = nUser.Name,
+                    Username = nUser.Username,
+                    Email = nUser.Email,
+                    Active = nUser.Active,
+                    UserRoles = nUser.UserRoles,
+                    Id = nUser.Id,
+                    CreatedDate = nUser.CreatedDate,
+                    DeletedDate = nUser.DeletedDate,
+                    Deleted = nUser.Deleted
+                    // RedisGuid = Guid.NewGuid()
+                });
         }
 
         [HttpPost("createAccount")]
