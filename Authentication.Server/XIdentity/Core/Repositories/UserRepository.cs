@@ -5,7 +5,7 @@ namespace Authentication.Server.XIdentity.Core.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    Dictionary<string, IUser> users = new(32);
+    readonly Dictionary<string, IUser> users = new(32);
 
     public Task<IUser?> GetUser(string id)
     {
@@ -33,6 +33,12 @@ public class UserRepository : IUserRepository
     public Task AddUser(IUser user)
     {
         users[user.Id] = user;
+        return Task.CompletedTask;
+    }
+
+    public Task UpdateUser(string id, IUser user)
+    {
+        users[id] = user;
         return Task.CompletedTask;
     }
 
