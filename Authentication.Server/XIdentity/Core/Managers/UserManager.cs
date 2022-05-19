@@ -22,10 +22,33 @@ public class UserManager : IUserManager<AppUser>
         _emailService = emailService;
     }
 
-    public async Task<bool> Register(AppUser user)
+    public string DoHashPassword(string password)
+    {
+        return CryptoUtils.HashPassword(password, Env.Salt, Env.BCryptWorkFactor);
+    }
+
+    public async Task<AppUser?> FindByEmailAsync(string email)
+    {
+        var user = await _userFactory.GetUserByEmail(email) as AppUser;
+        return user;
+    }
+
+    public async Task<AppUser?> FindByUsernameAsync(string username)
+    {
+        var user = await _userFactory.GetUserByUsername(username) as AppUser;
+        return user;
+    }
+
+    public async Task<AppUser?> GetUserAsync(string userId)
+    {
+        var user = await _userFactory.GetUser(userId) as AppUser;
+        return user;
+    }
+
+    public async Task<bool> RegisterAsync(AppUser user)
     {
         var validation = _validator.Validate(user.User);
-        if (validation.IsValid is not true)
+        if (!validation.IsValid)
             throw new Exception(validation.ToString());
 
         await _userFactory.AddUser(user);
@@ -33,19 +56,18 @@ public class UserManager : IUserManager<AppUser>
         return true;
     }
 
-    public async Task<bool> DeleteAccount(string userId)
+    public async Task<bool> DeleteAccountAsync(string userId)
     {
         await _userFactory.RemoveUser(userId);
         return true;
     }
 
-    public async Task<bool> ChangePassword(string userId, string oldPassword, string newPassword)
+    public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
     {
-        var user = await _userFactory.GetUser(userId) as AppUser;
-        if(user is null)
+        if (!(await _userFactory.GetUser(userId) is AppUser user))
             throw new Exception($"Cannot find user {userId}");
         bool passwordsSame = user.PasswordHash == oldPassword || user.PasswordHash == CryptoUtils.HashPassword(oldPassword, Env.Salt);
-        if(user.PasswordHash == oldPassword)
+        if (passwordsSame)
         {
             user.User.Password = newPassword;
             await _userFactory.UpdateUser(userId, user);
@@ -53,15 +75,16 @@ public class UserManager : IUserManager<AppUser>
             return true;
         }
         else
+        {
             throw new Exception("Old password is incorrect");
+        }
     }
 
-    public async Task<bool> ChangeEmail(string userId, string newEmail, string serverConfirmationCode, string clientConfirmationCode)
+    public async Task<bool> ChangeEmailAsync(string userId, string newEmail, string serverConfirmationCode, string clientConfirmationCode)
     {
         if(serverConfirmationCode != clientConfirmationCode)
             throw new Exception("Server and client confirmation codes do not match");
-        var user = await _userFactory.GetUser(userId) as AppUser;
-        if(user is null)
+        if (await _userFactory.GetUser(userId) is not AppUser user)
             throw new Exception($"Cannot find user {userId}");
         user.Email = newEmail;
         await _userFactory.UpdateUser(userId, user);
@@ -69,14 +92,12 @@ public class UserManager : IUserManager<AppUser>
         return true;
     }
     
-    public async Task<bool> IsValidPassword(string userId, string passwordHash)
+    public Task<bool> IsValidPasswordAsync(IUser user, string passwordOrPasswordHash)
     {
-        if(userId is null or "" || passwordHash is null or "")
-            throw new Exception("UserId or passwordHash is null or empty");
-        var user = await _userFactory.GetUser(userId) as AppUser;
-        if(user is null)
-            throw new Exception($"Cannot find user {userId}");
-        return user.PasswordHash == passwordHash;
+        if(user is null || passwordOrPasswordHash is null or "")
+            throw new Exception("User or password cannot be null");
+        bool valid = user.PasswordHash == passwordOrPasswordHash || user.PasswordHash == CryptoUtils.HashPassword(passwordOrPasswordHash, Env.Salt);
+        return Task.FromResult(valid);
     }
 
     public string GenerateConfirmationCode(string action)
