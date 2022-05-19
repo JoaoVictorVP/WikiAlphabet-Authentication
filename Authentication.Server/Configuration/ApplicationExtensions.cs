@@ -1,11 +1,15 @@
-﻿using Authentication.Server.XIdentity.Contracts;
+﻿using Authentication.Server.Contracts.Services;
+using Authentication.Server.Services;
+using Authentication.Server.XIdentity.Contracts;
 using Authentication.Server.XIdentity.Contracts.Factories;
 using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Repositories;
+using Authentication.Server.XIdentity.Contracts.Services;
 using Authentication.Server.XIdentity.Core.Factories;
 using Authentication.Server.XIdentity.Core.Managers;
 using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Server.XIdentity.Core.Repositories;
+using Authentication.Server.XIdentity.Core.Services;
 using Authentication.Shared;
 using Authentication.Shared.Contracts.Validators;
 using Authentication.Shared.Core.Validators;
@@ -38,14 +42,18 @@ public static class ApplicationExtensions
             };
         });
 
+        services.AddTransient<ITokenService, JWTokenService>();
+
         services.AddTransient<IUserManager<AppUser>, UserManager>();
         services.AddTransient<IUserFactory, UserFactory>();
-        services.AddTransient<IUserRepository, UserRepository>();
+        services.AddSingleton<IUserRepository, UserRepository>();
 
         services.AddTransient<IRoleManager<Role>, RoleManager>();
+
+        services.AddTransient<IEmailService, EmailService>();
     }
 
-    public static void ConfigureAuth(this WebApplication app)
+    public static void ConfigureAuth(this IApplicationBuilder app)
     {
         app.UseAuthentication();
         app.UseAuthorization();
