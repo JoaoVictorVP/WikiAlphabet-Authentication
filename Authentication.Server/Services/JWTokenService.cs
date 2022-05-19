@@ -34,10 +34,10 @@ public class JWTokenService : ITokenService
         return list;
     }
 
-    public string GenerateToken(string secret, IUser user, TimeSpan lifetime)
+    public string GenerateToken(byte[] secret, IUser user, TimeSpan lifetime)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = new SymmetricSecurityKey(Env.Secret);
+        var key = new SymmetricSecurityKey(secret);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Expires = DateTime.UtcNow.Add(lifetime),
@@ -49,7 +49,7 @@ public class JWTokenService : ITokenService
         return tokenHandler.WriteToken(token);
     }
 
-    public string GenerateRefreshToken(string fromToken, TimeSpan lifetime)
+    public string GenerateRefreshToken(byte[] secret, string fromToken, TimeSpan lifetime)
     {
         var token = new JwtSecurityToken(fromToken);
         var id = token.Claims.FirstOrDefault(claim => claim.Type == ClaimTypeID);
@@ -57,7 +57,7 @@ public class JWTokenService : ITokenService
             return InvalidToken;
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = new SymmetricSecurityKey(Env.Secret);
+        var key = new SymmetricSecurityKey(secret);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Expires = DateTime.UtcNow.Add(lifetime),
