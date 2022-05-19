@@ -47,6 +47,7 @@ public class UserManager : IUserManager<AppUser>
 
     public async Task<bool> RegisterAsync(AppUser user)
     {
+        user.User.Password = DoHashPassword(user.User.Password);
         var validation = _validator.Validate(user.User);
         if (!validation.IsValid)
             throw new Exception(validation.ToString());
@@ -64,12 +65,13 @@ public class UserManager : IUserManager<AppUser>
 
     public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
     {
-        if (!(await _userFactory.GetUser(userId) is AppUser user))
+        if (await _userFactory.GetUser(userId) is not AppUser user)
             throw new Exception($"Cannot find user {userId}");
-        bool passwordsSame = user.PasswordHash == oldPassword || user.PasswordHash == CryptoUtils.HashPassword(oldPassword, Env.Salt);
+        oldPassword = DoHashPassword(oldPassword);
+        bool passwordsSame = user.PasswordHash == oldPassword;
         if (passwordsSame)
         {
-            user.User.Password = newPassword;
+            user.User.Password = DoHashPassword(newPassword);
             await _userFactory.UpdateUser(userId, user);
             await _emailService.SendEmail(user.Email, "Password Changed", Emails.PasswordChanged());
             return true;
@@ -96,7 +98,7 @@ public class UserManager : IUserManager<AppUser>
     {
         if(user is null || passwordOrPasswordHash is null or "")
             throw new Exception("User or password cannot be null");
-        bool valid = user.PasswordHash == passwordOrPasswordHash || user.PasswordHash == CryptoUtils.HashPassword(passwordOrPasswordHash, Env.Salt);
+        bool valid = user.PasswordHash == passwordOrPasswordHash || user.PasswordHash == DoHashPassword(passwordOrPasswordHash);
         return Task.FromResult(valid);
     }
 
