@@ -12,7 +12,9 @@ public static class CryptoUtils
 {
     public static string HashPassword(string password, byte[] salt, int cost = 6)
     {
-        return Convert.ToBase64String(BCrypt.Generate(Encoding.Unicode.GetBytes(password), salt, cost));
+        var finalSalt = new byte[32];
+        SHA256.HashData(salt, finalSalt);
+        return Convert.ToBase64String(BCrypt.Generate(Encoding.Unicode.GetBytes(password), finalSalt[..16], cost));
     }
 
     public static string HashWithMAC(byte[] salt, byte[] actionBytes)
