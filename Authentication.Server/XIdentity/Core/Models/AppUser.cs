@@ -5,12 +5,13 @@ using System.Runtime.Serialization;
 
 namespace Authentication.Server.XIdentity.Core.Models;
 
-public class AppUser : IUser
+public class AppUser<TUser> : IServerUser, IBackingSharedUser where TUser : IUser
 {
-    private User _user;
-    public User User { get => _user; set => _user = value; }
+    IUser IBackingSharedUser.User => _user;
+    private TUser _user;
+    public TUser User { get => _user; set => _user = value; }
 
-    public AppUser(User user)
+    public AppUser(TUser user)
     {
         _user = user;
     }
@@ -21,7 +22,8 @@ public class AppUser : IUser
     public string Username { get => _user.Username; set => _user.Username = value; }
     [IgnoreDataMember]
     public string Email { get => _user.Email; set => _user.Email = value; }
-    public string PasswordHash { get => _user.Password; }
+    [IgnoreDataMember]
+    public string Password { get => _user.Password; set => _user.Password = value; }
 
     public IEnumerable<UserRole> GetAllRoles() => _user.UserRoles;
     public UserRole? GetRole(string roleName) => _user.UserRoles.Find(role => role.RoleName == roleName);

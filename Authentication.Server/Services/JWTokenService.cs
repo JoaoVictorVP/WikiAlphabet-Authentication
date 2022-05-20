@@ -20,7 +20,7 @@ public class JWTokenService : ITokenService
         return Convert.ToBase64String(random);
     }
 
-    static IEnumerable<SecClaim> GetClaimsFromUser(IUser user)
+    static IEnumerable<SecClaim> GetClaimsFromUser(IServerUser user)
     {
         var list = new List<SecClaim>(32);
 
@@ -34,7 +34,7 @@ public class JWTokenService : ITokenService
         return list;
     }
 
-    public string GenerateToken(byte[] secret, IUser user, TimeSpan lifetime)
+    public string GenerateToken(byte[] secret, IServerUser user, TimeSpan lifetime)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = new SymmetricSecurityKey(secret);

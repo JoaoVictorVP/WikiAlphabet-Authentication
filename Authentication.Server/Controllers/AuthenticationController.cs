@@ -21,10 +21,10 @@ namespace Authentication.Server.Controllers
     {
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IUserValidator _userValidator;
-        private readonly IUserManager<AppUser> _userManager;
+        private readonly IUserManager<defServerUser> _userManager;
         private readonly ITokenService _tokenService;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IUserValidator userValidator, IUserManager<AppUser> userManager, ITokenService tokenService)
+        public AuthenticationController(ILogger<AuthenticationController> logger, IUserValidator userValidator, IUserManager<defServerUser> userManager, ITokenService tokenService)
         {
             _logger = logger;
             _userValidator = userValidator;
@@ -32,15 +32,15 @@ namespace Authentication.Server.Controllers
             _tokenService = tokenService;
         }
 
-        AccountResponse ProduceTokenAndUserResponse(AppUser user)
+        AccountResponse<defUser> ProduceTokenAndUserResponse(defServerUser user)
         {
             var token = _tokenService.GenerateToken(Env.Secret, user, Env.TokenLifetime);
             var nUser = user.User;
 
-            return new AccountResponse(token,
+            return new AccountResponse<defUser>(token,
                 Env.ApplicationId,
                 Env.TokenExpirationDate,
-                new User
+                new defUser
                 {
                     Name = nUser.Name,
                     Username = nUser.Username,
@@ -63,15 +63,29 @@ namespace Authentication.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CreateAccount([FromBody] User user)
         {
-            var validation = _userValidator.Validate(user);
-            if (validation.IsValid is not true)
-                return BadRequest(validation.ToString());
+            try
+            {
+                var validation = _userValidator.Validate(user);
+                if (validation.IsValid is not true)
+                {
+                    string badValidation = validation.ToString();
+                    if (_logger.IsEnabled(LogLevel.Information))
+                        _logger.LogInformation("Bad Account Creation: {badValidation}", badValidation);
+                    return BadRequest(badValidation);
+                }
 
-            var newUser = new AppUser(user);
+                var newUser = new defServerUser(user);
 
-            await _userManager.RegisterAsync(newUser);
+                await _userManager.RegisterAsync(newUser);
 
-            return Ok(ProduceTokenAndUserResponse(newUser));
+                return Ok(ProduceTokenAndUserResponse(newUser));
+            }
+            catch (Exception ex)
+            {
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError(ex, "Login failed for user: {user}", user);
+                return BadRequest(ex);
+            }
         }
 
         [HttpGet("test")]
@@ -81,8 +95,17 @@ namespace Authentication.Server.Controllers
         [Authorize]
         public async Task<IActionResult> Test()
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(10));
-            return Ok("Hello, Sir!");
+            try
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
+                return Ok("Hello, Sir!");
+            }
+            catch(Exception ex)
+            {
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError(ex, "Error in Test");
+                return BadRequest(ex);
+            }
         }
 
         [HttpPost("login")]
@@ -95,17 +118,26 @@ namespace Authentication.Server.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var (username, email, password) = request;
+            try
+            {
+                var (username, email, password) = request;
 
-            var user = username is not null ? await _userManager.FindByUsernameAsync(username)
-                : email is not null ? await _userManager.FindByEmailAsync(email) : null;
-            if(user is null)
-                return NotFound("User not found");
-            var validPassword = await _userManager.IsValidPasswordAsync(user, password);
-            if(validPassword is false)
-                return StatusCode(StatusCodes.Status403Forbidden, "Invalid password");
+                var user = username is not null ? await _userManager.FindByUsernameAsync(username)
+                    : email is not null ? await _userManager.FindByEmailAsync(email) : null;
+                if (user is null)
+                    return NotFound("User not found");
+                var validPassword = await _userManager.IsValidPasswordAsync(user, password);
+                if (validPassword is false)
+                    return StatusCode(StatusCodes.Status403Forbidden, "Invalid password");
 
-            return Ok(ProduceTokenAndUserResponse(user));
+                return Ok(ProduceTokenAndUserResponse(user));
+            }
+            catch(Exception ex)
+            {
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError(ex, "Cannot login from: {request}", request);
+                return BadRequest(ex);
+            }
         }
 
         [HttpDelete("deleteAccount")]
@@ -116,9 +148,18 @@ namespace Authentication.Server.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteAccount(string userId)
         {
-            await _userManager.DeleteAccountAsync(userId);
+            try
+            {
+                await _userManager.DeleteAccountAsync(userId);
 
-            return Ok();
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError(ex, "Error while trying to delete account for {userId}", userId);
+                return BadRequest(ex);
+            }
         }
     }
 }

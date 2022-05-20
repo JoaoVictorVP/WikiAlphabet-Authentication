@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace Authentication.Shared.Contracts.Validators;
 
-public interface IUserValidator : IModelValidator<User>
+public interface IUserValidator : IModelValidator<IUser>
 {
 }

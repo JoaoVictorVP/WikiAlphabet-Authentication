@@ -2,7 +2,7 @@
 
 namespace Authentication.Server.XIdentity.Contracts.Managers;
 
-public interface IUserManager<TUser> where TUser : IUser
+public interface IUserManager<TUser> where TUser : IServerUser
 {
     string DoHashPassword(string password);
     Task<TUser?> FindByEmailAsync(string email);
@@ -12,6 +12,6 @@ public interface IUserManager<TUser> where TUser : IUser
     Task<bool> DeleteAccountAsync(string userId);
     Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword);
     Task<bool> ChangeEmailAsync(string userId, string newEmail, string serverConfirmationCode, string clientConfirmationCode);
-    Task<bool> IsValidPasswordAsync(IUser user, string passwordOrPasswordHash);
+    Task<bool> IsValidPasswordAsync(IServerUser user, string passwordOrPasswordHash);
     string GenerateConfirmationCode(string action);
 }
