@@ -9,7 +9,7 @@ using Authentication.Shared.Contracts.Validators;
 
 namespace Authentication.Server.XIdentity.Core.Managers;
 
-public class UserManager : IUserManager<AppUser>
+public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerUser : class, IServerUser
 {
     private readonly IUserFactory _userFactory;
     private readonly IUserValidator _validator;
@@ -27,27 +27,27 @@ public class UserManager : IUserManager<AppUser>
         return CryptoUtils.HashPassword(password, Env.Salt, Env.BCryptWorkFactor);
     }
 
-    public async Task<AppUser?> FindByEmailAsync(string email)
+    public async Task<TServerUser?> FindByEmailAsync(string email)
     {
-        var user = await _userFactory.GetUserByEmail(email) as AppUser;
+        var user = await _userFactory.GetUserByEmail(email) as TServerUser;
         return user;
     }
 
-    public async Task<AppUser?> FindByUsernameAsync(string username)
+    public async Task<TServerUser?> FindByUsernameAsync(string username)
     {
-        var user = await _userFactory.GetUserByUsername(username) as AppUser;
+        var user = await _userFactory.GetUserByUsername(username) as TServerUser;
         return user;
     }
 
-    public async Task<AppUser?> GetUserAsync(string userId)
+    public async Task<TServerUser?> GetUserAsync(string userId)
     {
-        var user = await _userFactory.GetUser(userId) as AppUser;
+        var user = await _userFactory.GetUser(userId) as TServerUser;
         return user;
     }
 
-    public async Task<bool> RegisterAsync(AppUser user)
+    public async Task<bool> RegisterAsync(TServerUser user)
     {
-        user.User.Password = DoHashPassword(user.User.Password);
+        user.Password = DoHashPassword(user.Password);
         var validation = _validator.Validate(user.User);
         if (!validation.IsValid)
             throw new Exception(validation.ToString());
@@ -65,13 +65,13 @@ public class UserManager : IUserManager<AppUser>
 
     public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
     {
-        if (await _userFactory.GetUser(userId) is not AppUser user)
+        if (await _userFactory.GetUser(userId) is not TServerUser user)
             throw new Exception($"Cannot find user {userId}");
         oldPassword = DoHashPassword(oldPassword);
-        bool passwordsSame = user.PasswordHash == oldPassword;
+        bool passwordsSame = user.Password == oldPassword;
         if (passwordsSame)
         {
-            user.User.Password = DoHashPassword(newPassword);
+            user.Password = DoHashPassword(newPassword);
             await _userFactory.UpdateUser(userId, user);
             await _emailService.SendEmail(user.Email, "Password Changed", Emails.PasswordChanged());
             return true;
@@ -86,7 +86,7 @@ public class UserManager : IUserManager<AppUser>
     {
         if(serverConfirmationCode != clientConfirmationCode)
             throw new Exception("Server and client confirmation codes do not match");
-        if (await _userFactory.GetUser(userId) is not AppUser user)
+        if (await _userFactory.GetUser(userId) is not TServerUser user)
             throw new Exception($"Cannot find user {userId}");
         user.Email = newEmail;
         await _userFactory.UpdateUser(userId, user);
@@ -98,7 +98,7 @@ public class UserManager : IUserManager<AppUser>
     {
         if(user is null || passwordOrPasswordHash is null or "")
             throw new Exception("User or password cannot be null");
-        bool valid = user.PasswordHash == passwordOrPasswordHash || user.PasswordHash == DoHashPassword(passwordOrPasswordHash);
+        bool valid = user.Password == passwordOrPasswordHash || user.Password == DoHashPassword(passwordOrPasswordHash);
         return Task.FromResult(valid);
     }
 
