@@ -32,12 +32,12 @@ namespace Authentication.Server.Controllers
             _tokenService = tokenService;
         }
 
-        AccountResponse ProduceTokenAndUserResponse(defServerUser user)
+        AccountResponse<defUser> ProduceTokenAndUserResponse(defServerUser user)
         {
             var token = _tokenService.GenerateToken(Env.Secret, user, Env.TokenLifetime);
             var nUser = user.User;
 
-            return new AccountResponse(token,
+            return new AccountResponse<defUser>(token,
                 Env.ApplicationId,
                 Env.TokenExpirationDate,
                 new defUser

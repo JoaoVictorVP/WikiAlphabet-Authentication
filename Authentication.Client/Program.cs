@@ -46,7 +46,7 @@ async Task DisplayLogin()
     var response = await client.PostAsJsonAsync($"{url}api/authentication/login", request);
     if(response.IsSuccessStatusCode)
     {
-        var token = (await response.Content.ReadFromJsonAsync<AccountResponse>())!.Token;
+        var token = (await response.Content.ReadFromJsonAsync<AccountResponse<User>>())!.Token;
         AuthorizeClient(token);
         WriteLine("Login realizado com sucesso!");
     }
@@ -80,7 +80,7 @@ async Task DisplayRegister()
 
         var accountResult = await client.PostAsync(url + "api/authentication/createAccount", JsonContent.Create(user));
         accountResult.EnsureSuccessStatusCode();
-        var account = await accountResult.Content.ReadFromJsonAsync<AccountResponse>();
+        var account = await accountResult.Content.ReadFromJsonAsync<AccountResponse<User>>();
         AuthorizeClient(account!.Token);
 
         WriteLine($"Você foi registrado com sucesso como {username}");

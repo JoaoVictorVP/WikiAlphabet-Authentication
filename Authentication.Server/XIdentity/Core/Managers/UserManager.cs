@@ -48,9 +48,13 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
     public async Task<bool> RegisterAsync(TServerUser user)
     {
         user.Password = DoHashPassword(user.Password);
-        var validation = _validator.Validate(user.User);
-        if (!validation.IsValid)
-            throw new Exception(validation.ToString());
+
+        if (user is IBackingSharedUser backingUser)
+        {
+            var validation = _validator.Validate(backingUser.User);
+            if (!validation.IsValid)
+                throw new Exception(validation.ToString());
+        }
 
         await _userFactory.AddUser(user);
 

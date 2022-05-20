@@ -1,5 +1,4 @@
 ﻿using Authentication.Shared;
-using Authentication.Shared.Contracts;
 
 namespace Authentication.Server.XIdentity.Contracts;
 

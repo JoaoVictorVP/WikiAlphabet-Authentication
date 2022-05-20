@@ -5,8 +5,9 @@ using System.Runtime.Serialization;
 
 namespace Authentication.Server.XIdentity.Core.Models;
 
-public class AppUser<TUser> : IServerUser where TUser : IUser
+public class AppUser<TUser> : IServerUser, IBackingSharedUser where TUser : IUser
 {
+    IUser IBackingSharedUser.User => _user;
     private TUser _user;
     public TUser User { get => _user; set => _user = value; }
 
