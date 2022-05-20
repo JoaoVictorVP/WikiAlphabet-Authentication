@@ -21,10 +21,10 @@ namespace Authentication.Server.Controllers
     {
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IUserValidator _userValidator;
-        private readonly IUserManager<AppUser<User>> _userManager;
+        private readonly IUserManager<defServerUser> _userManager;
         private readonly ITokenService _tokenService;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IUserValidator userValidator, IUserManager<AppUser<User>> userManager, ITokenService tokenService)
+        public AuthenticationController(ILogger<AuthenticationController> logger, IUserValidator userValidator, IUserManager<defServerUser> userManager, ITokenService tokenService)
         {
             _logger = logger;
             _userValidator = userValidator;
@@ -32,7 +32,7 @@ namespace Authentication.Server.Controllers
             _tokenService = tokenService;
         }
 
-        AccountResponse ProduceTokenAndUserResponse(AppUser<User> user)
+        AccountResponse ProduceTokenAndUserResponse(defServerUser user)
         {
             var token = _tokenService.GenerateToken(Env.Secret, user, Env.TokenLifetime);
             var nUser = user.User;
@@ -40,7 +40,7 @@ namespace Authentication.Server.Controllers
             return new AccountResponse(token,
                 Env.ApplicationId,
                 Env.TokenExpirationDate,
-                new User
+                new defUser
                 {
                     Name = nUser.Name,
                     Username = nUser.Username,
@@ -67,7 +67,7 @@ namespace Authentication.Server.Controllers
             if (validation.IsValid is not true)
                 return BadRequest(validation.ToString());
 
-            var newUser = new AppUser<User>(user);
+            var newUser = new defServerUser(user);
 
             await _userManager.RegisterAsync(newUser);
 
