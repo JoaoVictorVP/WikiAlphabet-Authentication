@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace Authentication.Server.XIdentity.Core.Models;
 
-public class AppUser : IUser
+public class AppUser : IServerUser
 {
     private User _user;
     public User User { get => _user; set => _user = value; }

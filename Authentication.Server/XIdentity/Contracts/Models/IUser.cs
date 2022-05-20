@@ -3,7 +3,7 @@ using Authentication.Shared.Contracts;
 
 namespace Authentication.Server.XIdentity.Contracts;
 
-public interface IUser
+public interface IServerUser
 {
     string Id { get; set; }
     string Username { get; set; }

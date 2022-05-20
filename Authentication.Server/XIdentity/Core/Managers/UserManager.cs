@@ -94,7 +94,7 @@ public class UserManager : IUserManager<AppUser>
         return true;
     }
     
-    public Task<bool> IsValidPasswordAsync(IUser user, string passwordOrPasswordHash)
+    public Task<bool> IsValidPasswordAsync(IServerUser user, string passwordOrPasswordHash)
     {
         if(user is null || passwordOrPasswordHash is null or "")
             throw new Exception("User or password cannot be null");
