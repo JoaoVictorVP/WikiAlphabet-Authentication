@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Authentication.Shared.Core.Validators;
 
-public class UserValidator : AbstractValidator<User>, IUserValidator
+public class UserValidator : AbstractValidator<IUser>, IUserValidator
 {
     public UserValidator()
     {

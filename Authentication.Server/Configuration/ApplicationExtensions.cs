@@ -44,7 +44,7 @@ public static class ApplicationExtensions
 
         services.AddTransient<ITokenService, JWTokenService>();
 
-        services.AddTransient<IUserManager<AppUser>, UserManager>();
+        services.AddTransient<IUserManager< AppUser<User> >, UserManager< AppUser<User> > >();
         services.AddTransient<IUserFactory, UserFactory>();
         services.AddSingleton<IUserRepository, UserRepository>();
 
