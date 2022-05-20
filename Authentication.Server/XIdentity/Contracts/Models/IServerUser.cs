@@ -1,14 +1,13 @@
 ﻿using Authentication.Shared;
-using Authentication.Shared.Contracts;
 
 namespace Authentication.Server.XIdentity.Contracts;
 
-public interface IUser
+public interface IServerUser
 {
     string Id { get; set; }
     string Username { get; set; }
     string Email { get; set; }
-    string PasswordHash { get; }
+    string Password { get; set; }
     IEnumerable<UserRole> GetAllRoles();
     UserRole? GetRole(string roleName);
     void AddRole(UserRole role);

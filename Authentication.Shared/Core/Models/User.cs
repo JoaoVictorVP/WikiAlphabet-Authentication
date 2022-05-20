@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Authentication.Shared.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Authentication.Shared;
 
-public class User
+public class User : IUser
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = "";
