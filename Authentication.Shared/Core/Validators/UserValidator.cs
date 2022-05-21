@@ -17,6 +17,6 @@ public class UserValidator : AbstractValidator<IUser>, IUserValidator
         RuleFor(x => x.Username).NotNull().NotEmpty().MinimumLength(1);
         RuleFor(x => x.Email).EmailAddress();
         RuleFor(x => x.CreatedDate).GreaterThan(DateTime.MinValue).LessThan(DateTime.MaxValue);
-        RuleFor(x => x.Deleted).Equal(true);
+        RuleFor(x => x.Deleted).Equal(false);
     }
 }

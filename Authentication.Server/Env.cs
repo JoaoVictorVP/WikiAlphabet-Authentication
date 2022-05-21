@@ -10,7 +10,7 @@ public static class Env
         ?? throw new NotImplementedException("Need to define an environment variable called WIKI_AUTH_SECRET"));
 
     public static readonly byte[] Salt = Convert.FromBase64String(Environment.GetEnvironmentVariable("WIKI_AUTH_SALT")
-        ?? throw new NotImplementedException("Need to define an environment variable called WIKI_AUTH_SALT"));
+        ?? throw new NotImplementedException("Need to define an environment variable called WIKI_AUTH_SALT"))[..16];
     
     public static readonly int BCryptWorkFactor = int.Parse(Environment.GetEnvironmentVariable("WIKI_AUTH_BCRYPT_WORK_FACTOR")
         ?? throw new NotImplementedException("Need to define an environment variable called WIKI_AUTH_BCRYPT_WORK_FACTOR (default value: 10)"));

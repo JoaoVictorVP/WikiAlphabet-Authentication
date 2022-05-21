@@ -5,7 +5,9 @@ using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Services;
 using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Shared;
+using Authentication.Shared.Contracts.Services.Crypto;
 using Authentication.Shared.Contracts.Validators;
+using Authentication.Shared.Core.Models.Crypto;
 
 namespace Authentication.Server.XIdentity.Core.Managers;
 
@@ -15,16 +17,23 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
     private readonly IUserValidator _validator;
     private readonly IEmailService _emailService;
 
-    public UserManager(IUserFactory userFactory, IUserValidator validator, IEmailService emailService)
+    private readonly ICryptoServiceWithPasswordHashing<Salt128, Difficulty> _passwordHashingService;
+    private readonly ICryptoServiceWithHashing _hashingService;
+
+    public UserManager(IUserFactory userFactory, IUserValidator validator, IEmailService emailService, ICryptoServiceWithPasswordHashing<Salt128, Difficulty> passwordHashingService, ICryptoServiceWithHashing hashingService)
     {
         _userFactory = userFactory;
         _validator = validator;
         _emailService = emailService;
+        _passwordHashingService = passwordHashingService;
+        _hashingService = hashingService;
     }
 
     public string DoHashPassword(string password)
     {
-        return CryptoUtils.HashPassword(password, Env.Salt, Env.BCryptWorkFactor);
+        return _passwordHashingService.HashPassword(password.ToUnicodePlaintext(), 
+            new Salt128(Env.Salt), 
+            new Difficulty(Env.BCryptWorkFactor)).ToBase64();
     }
 
     public async Task<TServerUser?> FindByEmailAsync(string email)
@@ -111,7 +120,7 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
         string confirm = action + DateTime.UtcNow.ToString();
         var confirmBytes = Encoding.UTF8.GetBytes(confirm);
         var salt = Env.Salt;
-        var hash = CryptoUtils.HashWithMAC(salt, confirmBytes);
-        return hash.Substring(0, 6);
+        var hash = _hashingService.HMAC(salt, confirmBytes).ToHex().ToUpper();
+        return hash[..6];
     }
 }

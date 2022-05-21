@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace Authentication.Client;
 public static class Env
 {
-    public static readonly byte[] Salt = RandomNumberGenerator.GetBytes(32);
+    public static readonly byte[] Salt = RandomNumberGenerator.GetBytes(16);
     public static readonly int Difficulty = 10;
 }

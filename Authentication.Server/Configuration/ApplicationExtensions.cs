@@ -11,7 +11,10 @@ using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Server.XIdentity.Core.Repositories;
 using Authentication.Server.XIdentity.Core.Services;
 using Authentication.Shared;
+using Authentication.Shared.Contracts.Services.Crypto;
 using Authentication.Shared.Contracts.Validators;
+using Authentication.Shared.Core.Models.Crypto;
+using Authentication.Shared.Core.Services.Crypto;
 using Authentication.Shared.Core.Validators;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,6 +45,7 @@ public static class ApplicationExtensions
             };
         });
 
+        // Authentication
         services.AddTransient<ITokenService, JWTokenService>();
 
         services.AddTransient<IUserManager<defServerUser>, defUserManager>();
@@ -51,6 +55,10 @@ public static class ApplicationExtensions
         services.AddTransient<IRoleManager<Role>, RoleManager>();
 
         services.AddTransient<IEmailService, EmailService>();
+
+        // Cryptography
+        services.AddTransient<ICryptoServiceWithHashing, SHA256CryptoService>();
+        services.AddTransient<ICryptoServiceWithPasswordHashing<Salt128, Difficulty>, BCryptHashingCryptoService>();
     }
 
     public static void ConfigureAuth(this IApplicationBuilder app)
