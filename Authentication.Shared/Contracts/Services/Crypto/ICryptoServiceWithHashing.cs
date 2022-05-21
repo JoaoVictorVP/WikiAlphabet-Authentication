@@ -1,6 +1,6 @@
 ﻿namespace Authentication.Shared.Contracts.Services.Crypto;
 
-public interface ICryptoServiceWithHashing
+public interface ICryptoServiceWithHashing : ICryptoService
 {
     int HashSize { get; }
     byte[] HashData(ReadOnlySpan<byte> data);

@@ -2,7 +2,7 @@
 
 namespace Authentication.Shared.Contracts.Services.Crypto;
 
-public interface ICryptoServiceWithSymmetricEncryption<TArgsKey, TArgsIV>
+public interface ICryptoServiceWithSymmetricEncryption<TArgsKey, TArgsIV> : ICryptoService
     where TArgsKey : ICryptoArgsWithKey
     where TArgsIV : ICryptoArgsWithIV
 {

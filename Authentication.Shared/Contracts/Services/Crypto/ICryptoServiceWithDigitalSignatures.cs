@@ -2,7 +2,7 @@
 
 namespace Authentication.Shared.Contracts.Services.Crypto;
 
-public interface ICryptoServiceWithDigitalSignatures<TArgsPrivateKey, TArgsPublicKey>
+public interface ICryptoServiceWithDigitalSignatures<TArgsPrivateKey, TArgsPublicKey> : ICryptoService
     where TArgsPrivateKey : ICryptoArgsWithKey
     where TArgsPublicKey : ICryptoArgsWithKey
 {
