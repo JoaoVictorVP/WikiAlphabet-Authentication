@@ -7,9 +7,18 @@ on:
     branches: [ master ]
 
 jobs:
+
   build:
 
     runs-on: ubuntu-latest
+    
+    env:
+      # public factors
+      WIKI_AUTH_BCRYPT_WORK_FACTOR: 11
+      WIKI_TOKEN_LIFETIME: "8:00:00"
+      # private factors
+      WIKI_AUTH_SECRET: ${{ secrets.WIKI_AUTH_SECRET }}
+      WIKI_AUTH_SALT: ${{ secrets.WIKI_AUTH_SALT }}
 
     steps:
     - uses: actions/checkout@v3
