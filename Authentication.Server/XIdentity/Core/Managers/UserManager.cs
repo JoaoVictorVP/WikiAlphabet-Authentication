@@ -118,6 +118,6 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
         var confirmBytes = Encoding.UTF8.GetBytes(confirm);
         var salt = Env.Salt;
         var hash = CryptoUtils.HashWithMAC(salt, confirmBytes);
-        return hash.Substring(0, 6);
+        return hash[..6];
     }
 }
