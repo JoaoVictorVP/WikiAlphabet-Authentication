@@ -2,6 +2,5 @@
 
 public interface ICryptoArgsWithPassword : ICryptoArgs
 {
-    void Password(string password);
     string GetPassword();
 }

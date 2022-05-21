@@ -2,6 +2,5 @@
 
 public interface ICryptoArgsWithIterations : ICryptoArgs
 {
-    void Iterations(int iterations);
     int GetIterations();
 }

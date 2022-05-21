@@ -8,6 +8,5 @@ namespace Authentication.Shared.Contracts.Models;
 
 public interface ICryptoArgs
 {
-    void Generic(string name, object value);
-    T Get<T>(string name);
+    
 }

@@ -2,6 +2,5 @@
 
 public interface ICryptoArgsWithDifficulty : ICryptoArgs
 {
-    void Difficulty(int difficulty);
     int GetDifficulty();
 }
