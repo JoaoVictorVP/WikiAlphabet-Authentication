@@ -16,14 +16,17 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
     private readonly IUserFactory _userFactory;
     private readonly IUserValidator _validator;
     private readonly IEmailService _emailService;
-    private readonly ICryptoServiceWithPasswordHashing<Salt128, Difficulty> _passwordHashingService;
 
-    public UserManager(IUserFactory userFactory, IUserValidator validator, IEmailService emailService, ICryptoServiceWithPasswordHashing<Salt128, Difficulty> passwordHashingService)
+    private readonly ICryptoServiceWithPasswordHashing<Salt128, Difficulty> _passwordHashingService;
+    private readonly ICryptoServiceWithHashing _hashingService;
+
+    public UserManager(IUserFactory userFactory, IUserValidator validator, IEmailService emailService, ICryptoServiceWithPasswordHashing<Salt128, Difficulty> passwordHashingService, ICryptoServiceWithHashing hashingService)
     {
         _userFactory = userFactory;
         _validator = validator;
         _emailService = emailService;
         _passwordHashingService = passwordHashingService;
+        _hashingService = hashingService;
     }
 
     public string DoHashPassword(string password)
@@ -117,7 +120,7 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
         string confirm = action + DateTime.UtcNow.ToString();
         var confirmBytes = Encoding.UTF8.GetBytes(confirm);
         var salt = Env.Salt;
-        var hash = CryptoUtils.HashWithMAC(salt, confirmBytes);
+        var hash = _hashingService.HMAC(salt, confirmBytes).ToHex().ToUpper();
         return hash[..6];
     }
 }

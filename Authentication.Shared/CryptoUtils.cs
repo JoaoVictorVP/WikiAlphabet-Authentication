@@ -10,10 +10,4 @@ namespace Authentication.Shared;
 
 public static class CryptoUtils
 {
-    public static string HashWithMAC(byte[] salt, byte[] actionBytes)
-    {
-        Span<byte> hash = stackalloc byte[32];
-        HMACSHA256.HashData(salt, actionBytes, hash);
-        return Convert.ToBase64String(hash);
-    }
 }
