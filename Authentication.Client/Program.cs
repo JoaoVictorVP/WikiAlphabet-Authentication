@@ -8,9 +8,17 @@ using System.Net.Http.Json;
 using Authentication.Shared.Core.Requests;
 using System.Dynamic;
 using Authentication.Shared.Core.Responses;
+using Authentication.Shared.Core.Services.Crypto;
+using Authentication.Shared.Core.Models.Crypto;
+
+var passwordHashingService = new BCryptHashingCryptoService();
+var salt = new Salt128(Env.Salt);
+var difficulty = new Difficulty(Env.Difficulty);
 
 var clientHandler = new HttpClientHandler();
+
 clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
 HttpClient client = new (clientHandler);
 
 string url = Input("Url do site: ", "https://localhost:5001/");
@@ -41,7 +49,7 @@ async Task DisplayLogin()
     var request = new LoginRequest()
     {
         Username = username,
-        Password = CryptoUtils.HashPassword(password, Env.Salt, Env.Difficulty)
+        Password = passwordHashingService.HashPassword(password.ToUnicodePlaintext(), salt, difficulty).ToBase64()
     };
     var response = await client.PostAsJsonAsync($"{url}api/authentication/login", request);
     if(response.IsSuccessStatusCode)
@@ -70,7 +78,7 @@ async Task DisplayRegister()
             Name = name,
             Email = email,
             Username = username,
-            Password = CryptoUtils.HashPassword(password, Env.Salt, Env.Difficulty),
+            Password = passwordHashingService.HashPassword(password.ToUnicodePlaintext(), salt, difficulty).ToBase64(),
             Active = true,
             CreatedDate = DateTime.Now,
             Deleted = false,

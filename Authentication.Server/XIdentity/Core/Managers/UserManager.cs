@@ -5,7 +5,9 @@ using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Services;
 using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Shared;
+using Authentication.Shared.Contracts.Services.Crypto;
 using Authentication.Shared.Contracts.Validators;
+using Authentication.Shared.Core.Models.Crypto;
 
 namespace Authentication.Server.XIdentity.Core.Managers;
 
@@ -14,17 +16,21 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
     private readonly IUserFactory _userFactory;
     private readonly IUserValidator _validator;
     private readonly IEmailService _emailService;
+    private readonly ICryptoServiceWithPasswordHashing<Salt128, Difficulty> _passwordHashingService;
 
-    public UserManager(IUserFactory userFactory, IUserValidator validator, IEmailService emailService)
+    public UserManager(IUserFactory userFactory, IUserValidator validator, IEmailService emailService, ICryptoServiceWithPasswordHashing<Salt128, Difficulty> passwordHashingService)
     {
         _userFactory = userFactory;
         _validator = validator;
         _emailService = emailService;
+        _passwordHashingService = passwordHashingService;
     }
 
     public string DoHashPassword(string password)
     {
-        return CryptoUtils.HashPassword(password, Env.Salt, Env.BCryptWorkFactor);
+        return _passwordHashingService.HashPassword(password.ToUnicodePlaintext(), 
+            new Salt128(Env.Salt), 
+            new Difficulty(Env.BCryptWorkFactor)).ToBase64();
     }
 
     public async Task<TServerUser?> FindByEmailAsync(string email)
