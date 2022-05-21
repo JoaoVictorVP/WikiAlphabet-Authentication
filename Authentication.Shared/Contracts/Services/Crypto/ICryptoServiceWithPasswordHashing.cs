@@ -6,5 +6,6 @@ public interface ICryptoServiceWithPasswordHashing<TArgsSalt, TArgsDifficulty> :
     where TArgsSalt : ICryptoArgsWithSalt
     where TArgsDifficulty : ICryptoArgsWithDifficulty
 {
-    string HashPassword(string password, TArgsSalt argsSalt, TArgsDifficulty argsDifficulty);
+    void HashPassword(ReadOnlySpan<byte> password, TArgsSalt salt, TArgsDifficulty difficulty, Span<byte> destHashedPassword);
+    byte[] HashPassword(ReadOnlySpan<byte> password, TArgsSalt salt, TArgsDifficulty difficulty);
 }
