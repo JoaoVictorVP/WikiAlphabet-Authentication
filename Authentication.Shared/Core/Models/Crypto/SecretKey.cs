@@ -12,6 +12,8 @@ public readonly struct SecretKey : ICryptoArgsWithKey, ICryptoArgsWithGenericGet
     readonly byte[] _key;
     public int KeySize => 0;
 
+    public SecretKey WithKey(byte[] key) => new (key);
+
     public byte[] GetKey() => _key;
     public void GetKey(Span<byte> destKey) => _key.CopyTo(destKey);
 
