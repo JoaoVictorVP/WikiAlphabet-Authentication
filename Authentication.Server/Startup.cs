@@ -15,6 +15,11 @@ public static class Startup
         services.AddValidators();
     }
 
+    public static void OnDatabases(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDatabases(configuration);
+    }
+
     public static void OnSwaggerStart(IServiceCollection services)
     {
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

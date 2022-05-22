@@ -1,50 +1,82 @@
-﻿using Authentication.Server.XIdentity.Contracts;
+﻿using Authentication.Server.Databases.Contracts;
+using Authentication.Server.XIdentity.Contracts;
+using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Repositories;
+using LiteDB;
 
 namespace Authentication.Server.XIdentity.Core.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository<TServerUser> : IUserRepository<TServerUser> where TServerUser : class, IServerUser
 {
-    readonly Dictionary<string, IServerUser> users = new(32);
+    private readonly IDatabaseFactory<LiteDatabase> _databaseFactory;
+    private readonly IServerManager<IServer> _serverManager;
+    private readonly ILiteDatabase _db;
 
-    public Task<IServerUser?> GetUser(string id)
+    public UserRepository(IDatabaseFactory<LiteDatabase> databaseFactory, IServerManager<defServer> serverManager)
     {
-        users.TryGetValue(id, out var user);
-        return Task.FromResult(user);
+        _databaseFactory = databaseFactory;
+        _serverManager = serverManager;
+        _db = _databaseFactory.Get();
     }
 
-    public Task<IServerUser?> GetUserByUsername(string username)
+    public async Task<TServerUser?> GetUser(string serverId, string id)
     {
-        return Task.FromResult(users.Values.FirstOrDefault(u => u.Username == username));
+        if (await _serverManager.IsValidServerAsync(serverId) is false)
+            return null;
+        var users = _db.GetCollection<TServerUser>(serverId);
+        var user = users.FindById(id);
+        return user;
     }
 
-    public Task<IServerUser?> GetUserByEmail(string email)
+    public async Task<TServerUser?> GetUserByUsername(string serverId, string username)
     {
-        return Task.FromResult(users.Values.FirstOrDefault(u => u.Email == email));
+        if (await _serverManager.IsValidServerAsync(serverId) is false)
+            return null;
+        var users = _db.GetCollection<TServerUser>(serverId);
+        return users.FindOne(u => u.Username == username);
     }
 
-    public async IAsyncEnumerable<IServerUser> GetUsersByRole(string roleName)
+    public async Task<TServerUser?> GetUserByEmail(string serverId, string email)
     {
-        var withEmail = users.Where(x => x.Value.GetRole(roleName) is not null);
-        foreach (var (_, user) in withEmail)
+        if (await _serverManager.IsValidServerAsync(serverId) is false)
+            return null;
+        var users = _db.GetCollection<TServerUser>(serverId);
+        return users.FindOne(u => u.Email == email);
+    }
+
+    public async IAsyncEnumerable<TServerUser> GetUsersByRole(string serverId, string roleName)
+    {
+        if (await _serverManager.IsValidServerAsync(serverId) is false)
+            yield break;
+
+        var users = _db.GetCollection<TServerUser>(serverId);
+        var withRole = users.Find((x => x.GetRole(roleName) != null));
+
+        foreach (var user in withRole)
             yield return user;
     }
 
-    public Task AddUser(IServerUser user)
+    public async Task AddUser(string serverId, TServerUser user)
     {
-        users[user.Id] = user;
-        return Task.CompletedTask;
+        if (await _serverManager.IsValidServerAsync(serverId) is false)
+            return;
+        var users = _db.GetCollection<TServerUser>(serverId);
+        users.Insert(user);
     }
 
-    public Task UpdateUser(string id, IServerUser user)
+    public async Task UpdateUser(string serverId, string id, TServerUser user)
     {
-        users[id] = user;
-        return Task.CompletedTask;
+        if (await _serverManager.IsValidServerAsync(serverId) is false)
+            return;
+        var users = _db.GetCollection<TServerUser>(serverId);
+        users.Update(user);
     }
 
-    public Task RemoveUser(string id)
+    public async Task RemoveUser(string serverId, string id)
     {
-        users.Remove(id);
-        return Task.CompletedTask;
+        if (await _serverManager.IsValidServerAsync(serverId) is false)
+            return;
+        var users = _db.GetCollection<TServerUser>(serverId);
+        users.Delete(id);
     }
 }

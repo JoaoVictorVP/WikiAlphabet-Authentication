@@ -4,20 +4,33 @@ using Authentication.Server.XIdentity.Contracts.Repositories;
 
 namespace Authentication.Server.XIdentity.Core.Factories;
 
-public class UserFactory : IUserFactory
+public class UserFactory<TServerUser> : IUserFactory<TServerUser> where TServerUser : class, IServerUser
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserRepository<TServerUser> _userRepository;
 
-    public UserFactory(IUserRepository userRepository)
+    public UserFactory(IUserRepository<TServerUser> userRepository)
     {
         _userRepository = userRepository;
     }
 
-    public Task<IServerUser?> GetUser(string id) => _userRepository.GetUser(id);
-    public Task<IServerUser?> GetUserByUsername(string username) => _userRepository.GetUserByUsername(username);
-    public Task<IServerUser?> GetUserByEmail(string email) => _userRepository.GetUserByEmail(email);
-    public IAsyncEnumerable<IServerUser> GetUsersByRole(string roleName) => _userRepository.GetUsersByRole(roleName);
-    public Task AddUser(IServerUser user) => _userRepository.AddUser(user);
-    public Task UpdateUser(string id, IServerUser user) => _userRepository.UpdateUser(id, user);
-    public Task RemoveUser(string id) => _userRepository.RemoveUser(id);
+    public Task<TServerUser?> GetUser(string serverId, string id) 
+        => _userRepository.GetUser(serverId, id);
+
+    public Task<TServerUser?> GetUserByUsername(string serverId, string username) 
+        => _userRepository.GetUserByUsername(serverId, username);
+
+    public Task<TServerUser?> GetUserByEmail(string serverId, string email) 
+        => _userRepository.GetUserByEmail(serverId, email);
+
+    public IAsyncEnumerable<TServerUser> GetUsersByRole(string serverId, string roleName) 
+        => _userRepository.GetUsersByRole(serverId, roleName);
+
+    public Task AddUser(string serverId, TServerUser user) 
+        => _userRepository.AddUser(serverId, user);
+    
+    public Task UpdateUser(string serverId, string id, TServerUser user) 
+        => _userRepository.UpdateUser(serverId, id, user);
+    
+    public Task RemoveUser(string serverId, string id) 
+        => _userRepository.RemoveUser(serverId, id);
 }
