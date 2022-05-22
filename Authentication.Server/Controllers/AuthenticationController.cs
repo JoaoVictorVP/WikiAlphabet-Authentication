@@ -55,13 +55,13 @@ namespace Authentication.Server.Controllers
                 });
         }
 
-        [HttpPost("createAccount")]
+        [HttpPost("createAccount/{serverId}")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateAccount([FromBody] User user)
+        public async Task<IActionResult> CreateAccount(string serverId, [FromBody] User user)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Authentication.Server.Controllers
 
                 var newUser = new defServerUser(user);
 
-                await _userManager.RegisterAsync(newUser);
+                await _userManager.RegisterAsync(serverId, newUser);
 
                 return Ok(ProduceTokenAndUserResponse(newUser));
             }
@@ -108,7 +108,7 @@ namespace Authentication.Server.Controllers
             }
         }
 
-        [HttpPost("login")]
+        [HttpPost("login/{serverId}")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,17 +116,17 @@ namespace Authentication.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login(string serverId, [FromBody] LoginRequest request)
         {
             try
             {
                 var (username, email, password) = request;
 
-                var user = username is not null ? await _userManager.FindByUsernameAsync(username)
-                    : email is not null ? await _userManager.FindByEmailAsync(email) : null;
+                var user = username is not null ? await _userManager.FindByUsernameAsync(serverId, username)
+                    : email is not null ? await _userManager.FindByEmailAsync(serverId, email) : null;
                 if (user is null)
                     return NotFound("User not found");
-                var validPassword = await _userManager.IsValidPasswordAsync(user, password);
+                var validPassword = await _userManager.IsValidPasswordAsync(serverId, user, password);
                 if (validPassword is false)
                     return StatusCode(StatusCodes.Status403Forbidden, "Invalid password");
 
@@ -140,17 +140,17 @@ namespace Authentication.Server.Controllers
             }
         }
 
-        [HttpDelete("deleteAccount")]
+        [HttpDelete("deleteAccount/{serverId}")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
         [Authorize]
-        public async Task<IActionResult> DeleteAccount(string userId)
+        public async Task<IActionResult> DeleteAccount(string serverId, string userId)
         {
             try
             {
-                await _userManager.DeleteAccountAsync(userId);
+                await _userManager.DeleteAccountAsync(serverId, userId);
 
                 return Ok();
             }

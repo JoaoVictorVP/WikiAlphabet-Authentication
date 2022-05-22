@@ -13,14 +13,14 @@ namespace Authentication.Server.XIdentity.Core.Managers;
 
 public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerUser : class, IServerUser
 {
-    private readonly IUserFactory _userFactory;
+    private readonly IUserFactory<TServerUser> _userFactory;
     private readonly IUserValidator _validator;
     private readonly IEmailService _emailService;
 
     private readonly ICryptoServiceWithPasswordHashing<Salt128, Difficulty> _passwordHashingService;
     private readonly ICryptoServiceWithHashing _hashingService;
 
-    public UserManager(IUserFactory userFactory, IUserValidator validator, IEmailService emailService, ICryptoServiceWithPasswordHashing<Salt128, Difficulty> passwordHashingService, ICryptoServiceWithHashing hashingService)
+    public UserManager(IUserFactory<TServerUser> userFactory, IUserValidator validator, IEmailService emailService, ICryptoServiceWithPasswordHashing<Salt128, Difficulty> passwordHashingService, ICryptoServiceWithHashing hashingService)
     {
         _userFactory = userFactory;
         _validator = validator;
@@ -29,34 +29,34 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
         _hashingService = hashingService;
     }
 
-    public string DoHashPassword(string password)
+    public string DoHashPassword(string serverId, string password)
     {
         return _passwordHashingService.HashPassword(password.ToUnicodePlaintext(), 
             new Salt128(Env.Salt), 
             new Difficulty(Env.BCryptWorkFactor)).ToBase64();
     }
 
-    public async Task<TServerUser?> FindByEmailAsync(string email)
+    public async Task<TServerUser?> FindByEmailAsync(string serverId, string email)
     {
-        var user = await _userFactory.GetUserByEmail(email) as TServerUser;
+        var user = await _userFactory.GetUserByEmail(serverId, email) as TServerUser;
         return user;
     }
 
-    public async Task<TServerUser?> FindByUsernameAsync(string username)
+    public async Task<TServerUser?> FindByUsernameAsync(string serverId, string username)
     {
-        var user = await _userFactory.GetUserByUsername(username) as TServerUser;
+        var user = await _userFactory.GetUserByUsername(serverId, username) as TServerUser;
         return user;
     }
 
-    public async Task<TServerUser?> GetUserAsync(string userId)
+    public async Task<TServerUser?> GetUserAsync(string serverId, string userId)
     {
-        var user = await _userFactory.GetUser(userId) as TServerUser;
+        var user = await _userFactory.GetUser(serverId, userId) as TServerUser;
         return user;
     }
 
-    public async Task<bool> RegisterAsync(TServerUser user)
+    public async Task<bool> RegisterAsync(string serverId, TServerUser user)
     {
-        user.Password = DoHashPassword(user.Password);
+        user.Password = DoHashPassword(serverId, user.Password);
 
         if (user is IBackingSharedUser backingUser)
         {
@@ -65,27 +65,27 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
                 throw new Exception(validation.ToString());
         }
 
-        await _userFactory.AddUser(user);
+        await _userFactory.AddUser(serverId, user);
 
         return true;
     }
 
-    public async Task<bool> DeleteAccountAsync(string userId)
+    public async Task<bool> DeleteAccountAsync(string serverId, string userId)
     {
-        await _userFactory.RemoveUser(userId);
+        await _userFactory.RemoveUser(serverId, userId);
         return true;
     }
 
-    public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
+    public async Task<bool> ChangePasswordAsync(string serverId, string userId, string oldPassword, string newPassword)
     {
-        if (await _userFactory.GetUser(userId) is not TServerUser user)
+        if (await _userFactory.GetUser(serverId, userId) is not TServerUser user)
             throw new Exception($"Cannot find user {userId}");
-        oldPassword = DoHashPassword(oldPassword);
+        oldPassword = DoHashPassword(serverId, oldPassword);
         bool passwordsSame = user.Password == oldPassword;
         if (passwordsSame)
         {
-            user.Password = DoHashPassword(newPassword);
-            await _userFactory.UpdateUser(userId, user);
+            user.Password = DoHashPassword(serverId, newPassword);
+            await _userFactory.UpdateUser(serverId, userId, user);
             await _emailService.SendEmail(user.Email, "Password Changed", Emails.PasswordChanged());
             return true;
         }
@@ -95,27 +95,27 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
         }
     }
 
-    public async Task<bool> ChangeEmailAsync(string userId, string newEmail, string serverConfirmationCode, string clientConfirmationCode)
+    public async Task<bool> ChangeEmailAsync(string serverId, string userId, string newEmail, string serverConfirmationCode, string clientConfirmationCode)
     {
         if(serverConfirmationCode != clientConfirmationCode)
             throw new Exception("Server and client confirmation codes do not match");
-        if (await _userFactory.GetUser(userId) is not TServerUser user)
+        if (await _userFactory.GetUser(serverId, userId) is not TServerUser user)
             throw new Exception($"Cannot find user {userId}");
         user.Email = newEmail;
-        await _userFactory.UpdateUser(userId, user);
+        await _userFactory.UpdateUser(serverId, userId, user);
         await _emailService.SendEmail(user.Email, "Email Changed", Emails.EmailChanged());
         return true;
     }
     
-    public Task<bool> IsValidPasswordAsync(IServerUser user, string passwordOrPasswordHash)
+    public Task<bool> IsValidPasswordAsync(string serverId, IServerUser user, string passwordOrPasswordHash)
     {
         if(user is null || passwordOrPasswordHash is null or "")
             throw new Exception("User or password cannot be null");
-        bool valid = user.Password == passwordOrPasswordHash || user.Password == DoHashPassword(passwordOrPasswordHash);
+        bool valid = user.Password == passwordOrPasswordHash || user.Password == DoHashPassword(serverId, passwordOrPasswordHash);
         return Task.FromResult(valid);
     }
 
-    public string GenerateConfirmationCode(string action)
+    public string GenerateConfirmationCode(string serverId, string action)
     {
         string confirm = action + DateTime.UtcNow.ToString();
         var confirmBytes = Encoding.UTF8.GetBytes(confirm);
