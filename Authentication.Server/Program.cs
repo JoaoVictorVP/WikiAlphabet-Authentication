@@ -10,6 +10,8 @@ builder.Host.UseDefaultServiceProvider(options =>
 
 Startup.OnServices(builder.Services);
 
+Startup.OnDatabases(builder.Services, builder.Configuration);
+
 Startup.OnSwaggerStart(builder.Services);
 
 var app = builder.Build();

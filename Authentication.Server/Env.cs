@@ -4,6 +4,7 @@ public static class Env
 {
     public static readonly string ApplicationName = "weProtect";
     public static readonly string ApplicationId = "wisocialmedia";
+    
     public static readonly TimeSpan TokenLifetime = TimeSpan.Parse(Environment.GetEnvironmentVariable("WIKI_TOKEN_LIFETIME") ?? "8:00:00");
     public static readonly DateTime TokenExpirationDate = DateTime.UtcNow.Add(TokenLifetime);
     public static readonly byte[] Secret = Convert.FromBase64String(Environment.GetEnvironmentVariable("WIKI_AUTH_SECRET")

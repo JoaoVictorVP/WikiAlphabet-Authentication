@@ -1,4 +1,6 @@
 ﻿using Authentication.Server.Contracts.Services;
+using Authentication.Server.Databases.Contracts;
+using Authentication.Server.Databases.Core;
 using Authentication.Server.Services;
 using Authentication.Server.XIdentity.Contracts;
 using Authentication.Server.XIdentity.Contracts.Factories;
@@ -16,6 +18,7 @@ using Authentication.Shared.Contracts.Validators;
 using Authentication.Shared.Core.Models.Crypto;
 using Authentication.Shared.Core.Services.Crypto;
 using Authentication.Shared.Core.Validators;
+using LiteDB;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -59,6 +62,13 @@ public static class ApplicationExtensions
         // Cryptography
         services.AddTransient<ICryptoServiceWithHashing, SHA256CryptoService>();
         services.AddTransient<ICryptoServiceWithPasswordHashing<Salt128, Difficulty>, BCryptHashingCryptoService>();
+    }
+
+    public static void AddDatabases(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Databases
+        services.AddTransient<IDatabaseFactory<LiteDatabase>, LiteDBFactory>(
+            x => new LiteDBFactory(configuration.GetConnectionString("LiteDB")));
     }
 
     public static void ConfigureAuth(this IApplicationBuilder app)

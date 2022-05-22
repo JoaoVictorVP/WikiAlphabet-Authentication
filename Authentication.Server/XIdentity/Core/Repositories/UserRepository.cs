@@ -1,10 +1,21 @@
-﻿using Authentication.Server.XIdentity.Contracts;
+﻿using Authentication.Server.Databases.Contracts;
+using Authentication.Server.XIdentity.Contracts;
 using Authentication.Server.XIdentity.Contracts.Repositories;
+using LiteDB;
 
 namespace Authentication.Server.XIdentity.Core.Repositories;
 
 public class UserRepository : IUserRepository
 {
+    private readonly IDatabaseFactory<LiteDatabase> _databaseFactory;
+    private readonly ILiteDatabase _db;
+
+    public UserRepository(IDatabaseFactory<LiteDatabase> databaseFactory)
+    {
+        _databaseFactory = databaseFactory;
+        _db = _databaseFactory.Get();
+    }
+
     readonly Dictionary<string, IServerUser> users = new(32);
 
     public Task<IServerUser?> GetUser(string id)
