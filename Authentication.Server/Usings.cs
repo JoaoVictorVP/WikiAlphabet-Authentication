@@ -7,5 +7,5 @@ global using defUserManager = Authentication.Server.XIdentity.Core.Managers.User
     <Authentication.Shared.Core.Models.ServerUser>;
 
 // Servers
-global using defServer = Authentication.Shared.Contracts.Models.IServer;
+global using defServer = Authentication.Shared.Core.Models.Server;
 
