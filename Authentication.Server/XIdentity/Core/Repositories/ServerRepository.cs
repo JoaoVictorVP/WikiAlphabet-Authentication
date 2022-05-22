@@ -1,6 +1,6 @@
 ﻿using Authentication.Server.Databases.Contracts;
-using Authentication.Server.XIdentity.Contracts;
 using Authentication.Server.XIdentity.Contracts.Repositories;
+using Authentication.Shared.Contracts.Models;
 using LiteDB;
 
 namespace Authentication.Server.XIdentity.Core.Repositories;

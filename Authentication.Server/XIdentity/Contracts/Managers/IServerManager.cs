@@ -1,4 +1,6 @@
-﻿namespace Authentication.Server.XIdentity.Contracts.Managers;
+﻿using Authentication.Shared.Contracts.Models;
+
+namespace Authentication.Server.XIdentity.Contracts.Managers;
 
 public interface IServerManager<TServer> where TServer : IServer
 {

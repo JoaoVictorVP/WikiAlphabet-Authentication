@@ -1,5 +1,4 @@
 ﻿using Authentication.Server.Databases.Contracts;
-using Authentication.Server.XIdentity.Contracts;
 using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Repositories;
 using Authentication.Shared.Contracts.Models;
