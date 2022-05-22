@@ -5,7 +5,7 @@ public interface IServerManager<TServer> where TServer : IServer
     Task RegisterAsync(TServer server);
     Task UpdateAsync(TServer server);
     Task RemoveAsync(TServer server);
-    Task<TServer?> GetServerAsync(string serverId);
-    Task<TServer?> GetServerByNameAsync(string serverEmail);
+    Task<TServer?> LoginAsyncWithEmail(string email, string password);
+    Task<TServer?> LoginAsyncWithId(string serverId, string password);
     Task<bool> IsValidServerAsync(string serverId);
 }
