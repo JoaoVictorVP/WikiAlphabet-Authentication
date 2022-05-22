@@ -2,6 +2,6 @@
 
 namespace Authentication.Server.XIdentity.Contracts.Factories;
 
-public interface IUserFactory : IUserStorage
+public interface IUserFactory<TServerUser> : IUserStorage<TServerUser> where TServerUser : class, IServerUser
 {
 }

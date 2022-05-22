@@ -2,7 +2,7 @@
 
 namespace Authentication.Server.XIdentity.Contracts.Repositories;
 
-public interface IUserRepository : IUserStorage
+public interface IUserRepository<TServerUser> : IUserStorage<TServerUser> where TServerUser : class, IServerUser
 {
     
 }

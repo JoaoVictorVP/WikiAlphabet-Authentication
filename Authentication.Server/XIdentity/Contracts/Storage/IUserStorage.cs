@@ -1,12 +1,12 @@
 ﻿namespace Authentication.Server.XIdentity.Contracts.Storage;
 
-public interface IUserStorage
+public interface IUserStorage<TServerUser> where TServerUser : class, IServerUser
 {
-    Task<IServerUser?> GetUser(string id);
-    Task<IServerUser?> GetUserByUsername(string username);
-    Task<IServerUser?> GetUserByEmail(string email);
-    IAsyncEnumerable<IServerUser> GetUsersByRole(string roleName);
-    Task AddUser(IServerUser user);
-    Task UpdateUser(string id, IServerUser user);
-    Task RemoveUser(string id);
+    Task<TServerUser?> GetUser(string serverId, string id);
+    Task<TServerUser?> GetUserByUsername(string serverId, string username);
+    Task<TServerUser?> GetUserByEmail(string serverId, string email);
+    IAsyncEnumerable<TServerUser> GetUsersByRole(string serverId, string roleName);
+    Task AddUser(string serverId, TServerUser user);
+    Task UpdateUser(string serverId, string id, TServerUser user);
+    Task RemoveUser(string serverId, string id);
 }
