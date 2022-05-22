@@ -1,4 +1,5 @@
 ﻿using Authentication.Shared.Contracts;
+using Authentication.Shared.Contracts.Models;
 using Authentication.Shared.Contracts.Validators;
 using FluentValidation;
 using System;
@@ -9,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace Authentication.Shared.Core.Validators;
 
-public class UserValidator : AbstractValidator<IUser>, IUserValidator
+public class UserValidator : AbstractValidator<IServerUser>, IUserValidator
 {
     public UserValidator()
     {
-        RuleFor(x => x.Name).NotNull().NotEmpty().MinimumLength(1);
+        RuleFor(x => x.FullName).NotNull().NotEmpty().MinimumLength(1);
         RuleFor(x => x.Username).NotNull().NotEmpty().MinimumLength(1);
         RuleFor(x => x.Email).EmailAddress();
-        RuleFor(x => x.CreatedDate).GreaterThan(DateTime.MinValue).LessThan(DateTime.MaxValue);
-        RuleFor(x => x.Deleted).Equal(false);
+
+        RuleFor(x => x.CreatedAt).GreaterThan(DateTime.MinValue).LessThan(DateTime.MaxValue);
     }
 }

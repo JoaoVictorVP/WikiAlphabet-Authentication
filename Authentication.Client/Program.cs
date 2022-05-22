@@ -6,10 +6,10 @@ using Authentication.Client;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Authentication.Shared.Core.Requests;
-using System.Dynamic;
 using Authentication.Shared.Core.Responses;
 using Authentication.Shared.Core.Services.Crypto;
 using Authentication.Shared.Core.Models.Crypto;
+using Authentication.Shared.Core.Models;
 
 var passwordHashingService = new BCryptHashingCryptoService();
 var salt = new Salt128(Env.Salt);
@@ -54,7 +54,7 @@ async Task DisplayLogin()
     var response = await client.PostAsJsonAsync($"{url}api/authentication/login", request);
     if(response.IsSuccessStatusCode)
     {
-        var token = (await response.Content.ReadFromJsonAsync<AccountResponse<User>>())!.Token;
+        var token = (await response.Content.ReadFromJsonAsync<AccountResponse<ServerUser>>())!.Token;
         AuthorizeClient(token);
         WriteLine("Login realizado com sucesso!");
     }
@@ -72,23 +72,19 @@ async Task DisplayRegister()
         string username = Input("Nome de usuário: ");
         string password = Input("Senha: ");
         
-        var user = new User
+        var user = new ServerUser
         {
             Id = Guid.NewGuid().ToString(),
-            Name = name,
+            FullName = name,
             Email = email,
             Username = username,
             Password = passwordHashingService.HashPassword(password.ToUnicodePlaintext(), salt, difficulty).ToBase64(),
-            Active = true,
-            CreatedDate = DateTime.Now,
-            Deleted = false,
-            DeletedDate = null,
-            UserRoles = new List<UserRole>()
+            CreatedAt = DateTime.Now
         };
-
+        
         var accountResult = await client.PostAsync(url + "api/authentication/createAccount", JsonContent.Create(user));
         accountResult.EnsureSuccessStatusCode();
-        var account = await accountResult.Content.ReadFromJsonAsync<AccountResponse<User>>();
+        var account = await accountResult.Content.ReadFromJsonAsync<AccountResponse<ServerUser>>();
         AuthorizeClient(account!.Token);
 
         WriteLine($"Você foi registrado com sucesso como {username}");

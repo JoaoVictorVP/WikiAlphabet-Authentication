@@ -1,5 +1,5 @@
-﻿using Authentication.Server.XIdentity.Contracts;
-using Authentication.Shared;
+﻿using Authentication.Shared;
+using Authentication.Shared.Contracts.Models;
 
 namespace Authentication.Server.Contracts.Services;
 
