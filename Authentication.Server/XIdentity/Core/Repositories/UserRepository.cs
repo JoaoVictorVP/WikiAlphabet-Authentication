@@ -45,18 +45,6 @@ public class UserRepository<TServerUser> : IUserRepository<TServerUser> where TS
         return users.FindOne(u => u.Email == email);
     }
 
-    public async IAsyncEnumerable<TServerUser> GetUsersByRole(string serverId, string roleName)
-    {
-        if (await _serverManager.IsValidServerAsync(serverId) is false)
-            yield break;
-
-        var users = _db.GetCollection<TServerUser>(serverId);
-        var withRole = users.Find((x => x.GetRole(roleName) != null));
-
-        foreach (var user in withRole)
-            yield return user;
-    }
-
     public async Task AddUser(string serverId, TServerUser user)
     {
         if (await _serverManager.IsValidServerAsync(serverId) is false)

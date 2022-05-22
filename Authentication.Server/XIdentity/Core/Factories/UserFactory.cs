@@ -22,9 +22,6 @@ public class UserFactory<TServerUser> : IUserFactory<TServerUser> where TServerU
     public Task<TServerUser?> GetUserByEmail(string serverId, string email) 
         => _userRepository.GetUserByEmail(serverId, email);
 
-    public IAsyncEnumerable<TServerUser> GetUsersByRole(string serverId, string roleName) 
-        => _userRepository.GetUsersByRole(serverId, roleName);
-
     public Task AddUser(string serverId, TServerUser user) 
         => _userRepository.AddUser(serverId, user);
     
