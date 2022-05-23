@@ -9,7 +9,7 @@ namespace Authentication.Server.XIdentity.Core.Repositories;
 public class UserRepository<TServerUser> : IUserRepository<TServerUser> where TServerUser : class, IServerUser
 {
     private readonly IDatabaseFactory<LiteDatabase> _databaseFactory;
-    private readonly IServerManager<IServer> _serverManager;
+    private readonly IServerManager<defServer> _serverManager;
     private readonly ILiteDatabase _db;
 
     public UserRepository(IDatabaseFactory<LiteDatabase> databaseFactory, IServerManager<defServer> serverManager)
