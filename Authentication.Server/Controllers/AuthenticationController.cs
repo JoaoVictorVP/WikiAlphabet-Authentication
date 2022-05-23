@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Authentication.Server.Contracts.Services;
 using Authentication.Server.XIdentity.Contracts.Managers;
-using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Shared;
 using Authentication.Shared.Contracts.Validators;
 using Authentication.Shared.Core.Requests;
@@ -32,27 +31,14 @@ namespace Authentication.Server.Controllers
             _tokenService = tokenService;
         }
 
-        AccountResponse<defUser> ProduceTokenAndUserResponse(defServerUser user)
+        AccountResponse<defServerUser> ProduceTokenAndUserResponse(defServerUser user)
         {
             var token = _tokenService.GenerateToken(Env.Secret, user, Env.TokenLifetime);
-            var nUser = user.User;
-
-            return new AccountResponse<defUser>(token,
+            
+            return new AccountResponse<defServerUser>(token,
                 Env.ApplicationId,
                 Env.TokenExpirationDate,
-                new defUser
-                {
-                    Name = nUser.Name,
-                    Username = nUser.Username,
-                    Email = nUser.Email,
-                    Active = nUser.Active,
-                    UserRoles = nUser.UserRoles,
-                    Id = nUser.Id,
-                    CreatedDate = nUser.CreatedDate,
-                    DeletedDate = nUser.DeletedDate,
-                    Deleted = nUser.Deleted
-                    // RedisGuid = Guid.NewGuid()
-                });
+                user);
         }
 
         [HttpPost("createAccount/{serverId}")]
@@ -61,7 +47,7 @@ namespace Authentication.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
         [AllowAnonymous]
-        public async Task<IActionResult> CreateAccount(string serverId, [FromBody] User user)
+        public async Task<IActionResult> CreateAccount(string serverId, [FromBody] defServerUser user)
         {
             try
             {
@@ -74,11 +60,9 @@ namespace Authentication.Server.Controllers
                     return BadRequest(badValidation);
                 }
 
-                var newUser = new defServerUser(user);
+                await _userManager.RegisterAsync(serverId, user);
 
-                await _userManager.RegisterAsync(serverId, newUser);
-
-                return Ok(ProduceTokenAndUserResponse(newUser));
+                return Ok(ProduceTokenAndUserResponse(user));
             }
             catch (Exception ex)
             {

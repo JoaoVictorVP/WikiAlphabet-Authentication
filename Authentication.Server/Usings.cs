@@ -1,12 +1,11 @@
 ﻿
 global using defUser = Authentication.Shared.User;
 
-global using defServerUser = Authentication.Server.XIdentity.Core.Models.AppUser
-    <Authentication.Shared.User>;
+global using defServerUser = Authentication.Shared.Core.Models.ServerUser;
 
 global using defUserManager = Authentication.Server.XIdentity.Core.Managers.UserManager
-    <Authentication.Server.XIdentity.Core.Models.AppUser
-    <Authentication.Shared.User>>;
+    <Authentication.Shared.Core.Models.ServerUser>;
 
 // Servers
-global using defServer = Authentication.Server.XIdentity.Contracts.IServer;
+global using defServer = Authentication.Shared.Core.Models.Server;
+

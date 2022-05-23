@@ -1,6 +1,6 @@
 ﻿using Authentication.Server.Contracts.Services;
-using Authentication.Server.XIdentity.Contracts;
 using Authentication.Shared;
+using Authentication.Shared.Contracts.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -28,8 +28,9 @@ public class JWTokenService : ITokenService
 
         list.Add(new SecClaim(ClaimTypes.Name, user.Username));
 
-        foreach (var role in user.GetAllRoles())
-            list.Add(new SecClaim(ClaimTypes.Role, role.RoleName));
+        // TODO: handle JWT claims
+        //foreach (var role in user.GetAllRoles())
+        //    list.Add(new SecClaim(ClaimTypes.Role, role.RoleName));
 
         return list;
     }

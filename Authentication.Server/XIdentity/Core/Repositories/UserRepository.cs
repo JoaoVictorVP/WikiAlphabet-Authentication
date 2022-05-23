@@ -1,7 +1,7 @@
 ﻿using Authentication.Server.Databases.Contracts;
-using Authentication.Server.XIdentity.Contracts;
 using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Repositories;
+using Authentication.Shared.Contracts.Models;
 using LiteDB;
 
 namespace Authentication.Server.XIdentity.Core.Repositories;
@@ -9,7 +9,7 @@ namespace Authentication.Server.XIdentity.Core.Repositories;
 public class UserRepository<TServerUser> : IUserRepository<TServerUser> where TServerUser : class, IServerUser
 {
     private readonly IDatabaseFactory<LiteDatabase> _databaseFactory;
-    private readonly IServerManager<IServer> _serverManager;
+    private readonly IServerManager<defServer> _serverManager;
     private readonly ILiteDatabase _db;
 
     public UserRepository(IDatabaseFactory<LiteDatabase> databaseFactory, IServerManager<defServer> serverManager)
@@ -42,18 +42,6 @@ public class UserRepository<TServerUser> : IUserRepository<TServerUser> where TS
             return null;
         var users = _db.GetCollection<TServerUser>(serverId);
         return users.FindOne(u => u.Email == email);
-    }
-
-    public async IAsyncEnumerable<TServerUser> GetUsersByRole(string serverId, string roleName)
-    {
-        if (await _serverManager.IsValidServerAsync(serverId) is false)
-            yield break;
-
-        var users = _db.GetCollection<TServerUser>(serverId);
-        var withRole = users.Find((x => x.GetRole(roleName) != null));
-
-        foreach (var user in withRole)
-            yield return user;
     }
 
     public async Task AddUser(string serverId, TServerUser user)

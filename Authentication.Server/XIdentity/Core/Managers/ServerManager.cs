@@ -1,7 +1,7 @@
-﻿using Authentication.Server.XIdentity.Contracts;
-using Authentication.Server.XIdentity.Contracts.Factories;
+﻿using Authentication.Server.XIdentity.Contracts.Factories;
 using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Shared;
+using Authentication.Shared.Contracts.Models;
 using Authentication.Shared.Contracts.Services.Crypto;
 using Authentication.Shared.Core.Models.Crypto;
 

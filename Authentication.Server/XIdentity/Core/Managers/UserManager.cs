@@ -1,10 +1,9 @@
 ﻿using System.Text;
-using Authentication.Server.XIdentity.Contracts;
 using Authentication.Server.XIdentity.Contracts.Factories;
 using Authentication.Server.XIdentity.Contracts.Managers;
 using Authentication.Server.XIdentity.Contracts.Services;
-using Authentication.Server.XIdentity.Core.Models;
 using Authentication.Shared;
+using Authentication.Shared.Contracts.Models;
 using Authentication.Shared.Contracts.Services.Crypto;
 using Authentication.Shared.Contracts.Validators;
 using Authentication.Shared.Core.Models.Crypto;
@@ -58,12 +57,9 @@ public class UserManager<TServerUser> : IUserManager<TServerUser> where TServerU
     {
         user.Password = DoHashPassword(serverId, user.Password);
 
-        if (user is IBackingSharedUser backingUser)
-        {
-            var validation = _validator.Validate(backingUser.User);
-            if (!validation.IsValid)
-                throw new Exception(validation.ToString());
-        }
+        var validation = _validator.Validate(user);
+        if (!validation.IsValid)
+            throw new Exception(validation.ToString());
 
         await _userFactory.AddUser(serverId, user);
 
